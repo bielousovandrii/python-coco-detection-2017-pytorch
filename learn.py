@@ -6,7 +6,7 @@ from detect import get_model
 from coco import train_loader
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-model = get_model(num_classes=91)  # 80 классов COCO + фон
+model = get_model(num_classes=91)  
 model.to(device)
 
 optimizer = AdamW(model.parameters(), lr=1e-4)
@@ -17,7 +17,7 @@ for epoch in range(10):
     epoch_loss = 0
     for images, targets in tqdm(train_loader):
         if len(images) == 0 or len(targets) == 0:
-            continue  # Пропуск пустых батчей
+            continue  
 
         images = [image.to(device) for image in images]
         targets = [{k: v.to(device) for k, v in t.items()} for t in targets]
@@ -32,6 +32,5 @@ for epoch in range(10):
 
     print(f"Epoch {epoch + 1}, Loss: {epoch_loss}")
 
-    # Сохранение модели после каждой эпохи (или только после последней эпохи)
-    torch.save(model.state_dict(), f"model_epoch_{epoch + 1}.pth")  # Сохранение состояния модели
+    torch.save(model.state_dict(), f"model_epoch_{epoch + 1}.pth")
     print(f"Model saved at epoch {epoch + 1}")
