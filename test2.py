@@ -9,11 +9,11 @@ import matplotlib.pyplot as plt
 model_folder = "."
 model_files = [f for f in os.listdir(model_folder) if f.endswith('.pth')]
 
-test_image_path = "test.jpg"
+test_image_path = "test22.jpg"
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
 # Ground truth box для розрахунку IoU
-ground_truth_box = [634.493408203125, 212.12039184570312, 640.0, 331.7173767089844]
+ground_truth_box = [635.0601196289062,188.33197021484375,640.0,290.3623352050781]
 ground_truth_label = 1
 
 # Загрузка тестового изображения
@@ -97,12 +97,31 @@ plt.savefig("metrics_graph.png")
 plt.show()
 
 # Візуалізація рамок
-image_draw = Image.open(test_image_path).convert("RGB")
-draw = ImageDraw.Draw(image_draw)
+image_path = "test22.jpg"
+image = Image.open(image_path)
 
-for pred in model_predictions:
-    box = pred['box']
-    draw.rectangle(box, outline="red", width=3)
-    draw.text((box[0], box[1]), f"{pred['label']} {pred['score']:.2f}", fill="red")
+# Відкрити зображення у вікні для перегляду
+image.show()
 
-image_draw.save("predicted_image.jpg")
+# Координати ground_truth_box потрібно ввести вручну
+# Наприклад: [xmin, ymin, xmax, ymax]
+# Перевіряємо координати
+ground_truth_box = [630, 180, 639, 250]
+
+# Розмір зображення
+print(f"Image size: {image.size}")  # Додатковий контроль
+
+# Візуалізувати рамку
+draw = ImageDraw.Draw(image)
+
+# Малюємо рамку (Outline Red)
+if ground_truth_box[2] > ground_truth_box[0] and ground_truth_box[3] > ground_truth_box[1]:
+    draw.rectangle(ground_truth_box, outline="red", width=3)
+    print(f"Ground truth box: {ground_truth_box}")
+    print(f"Image size: {image.size}")
+
+else:
+    print("Invalid ground_truth_box coordinates.")
+
+# Зберігаємо зображення
+image.save("predicted_image.jpg")
