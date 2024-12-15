@@ -1,5 +1,5 @@
 import torch
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 from torchvision import models, transforms
 import os
 
@@ -28,22 +28,31 @@ scores = predictions[0]['scores']
 # Визначення ground truth box автоматично за допомогою найбільш впевненого результату
 # (можна додати фільтрацію за значенням confidence score)
 threshold = 0.5
-detected_box = None
+detected_boxes = []
+detected_scores = []
 for box, score in zip(boxes, scores):
     if score > threshold:
-        detected_box = box.tolist()
-        break  # Якщо знайдено перший об'єкт із достатньою впевненістю
+        detected_boxes.append(box.tolist())
+        detected_scores.append(score.item())
 
-if detected_box:
-    print(f"Detected ground truth box: {detected_box}")
+if detected_boxes:
+    print(f"Detected boxes: {detected_boxes}")
+    print(f"Scores: {detected_scores}")
 else:
     print("No object detected with sufficient confidence")
 
 # Візуалізуємо результат
 draw = ImageDraw.Draw(image)
-if detected_box:
-    draw.rectangle(detected_box, outline="red", width=3)
+font = ImageFont.load_default()
+
+for box, score in zip(detected_boxes, detected_scores):
+    draw.rectangle(box, outline="red", width=3)
+    # Додаємо score до рамки
+    text = f"{score:.2f}"
+    # Малюємо текст біля верхнього лівого кута рамки
+    text_position = (box[0], box[1] - 10)
+    draw.text(text_position, text, fill="red", font=font)
 
 # Зберігаємо результат
-image.save("output_detected_box.jpg")
+image.save("output_detected_box_with_score.jpg")
 image.show()
